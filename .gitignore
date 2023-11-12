@@ -1,2 +1,2 @@
 /hotel/static/dist/libs
-db.sqlite3
+*.sqlite*
