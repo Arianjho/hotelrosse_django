@@ -1,0 +1,213 @@
+{% extends "layout/base.html" %}
+
+{% block title %}
+    Hotel Rosse
+{% endblock %}
+
+{% block title_page %}
+    Listado de Habitaciones
+{% endblock %}
+
+{% block content %}
+    <div class="page-body">
+        <div class="container-xl">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="table-default" class="table-responsive">
+                                <table id="tabladata" class="table display hover cell-border">
+                                    <thead>
+                                        <tr>
+                                            <th width="40%">Habitacion</th>
+                                            <th width="30%">Tipo</th>
+                                            <th width="20%">Estado</th>
+                                            <th width="10%">Operaciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="table-tbody">
+                                        {% for hab in habitaciones %}
+                                            <tr>
+                                                <td>{{hab.habitacion}}</td>
+                                                <td>{{hab.tipo}}</td>
+                                                
+                                                    {% if hab.estado == 1 %}
+                                                        <td class="text-teal">Disponible</td>
+                                                    {% elif hab.estado == 2 %}
+                                                        <td class="text-orange">En mantenimiento</td>
+                                                    {% elif hab.estado == 3 %}
+                                                        <td class="text-blue">Ocupado</td>
+                                                    {% elif hab.estado == 0 %}
+                                                        <td class="text-red">No disponible</td>
+                                                    {% endif %}
+                                                
+                                                <td class="text-center">
+                                                    {% if hab.estado != 3 %}
+                                                        <a style="padding: 2px 5px;" href="#" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#edit{{hab.id}}">
+                                                            <svg style="margin: 0;" xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-edit" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                                <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"></path>
+                                                                <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"></path>
+                                                                <path d="M16 5l3 3"></path>
+                                                            </svg>
+                                                        </a>
+                                                        <a style="padding: 2px 5px;" href="#" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#delete{{hab.id}}">                                                
+                                                            <svg style="margin: 0;" xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                                <path d="M4 7l16 0"></path>
+                                                                <path d="M10 11l0 6"></path>
+                                                                <path d="M14 11l0 6"></path>
+                                                                <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
+                                                                <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
+                                                            </svg>
+                                                        </a>
+                                                    {% else %}
+                                                        -
+                                                    {% endif %}
+                                                </td>
+
+                                                <div class="modal modal-blur fade" id="edit{{hab.id}}" tabindex="-1" role="dialog" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                                        <div class="modal-content">
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        <div class="modal-status bg-info"></div>
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">Editar Habitacion</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <form action="{% url 'habitacion_update' hab.id %}" method="post">
+                                                                {% csrf_token %}
+
+                                                                <div class="modal-body py-4">
+                                                                    <div class="row">
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label class="form-label required">Habitacion</label>
+                                                                            <input type="text" class="form-control " name="habitacion" value="{{hab.habitacion}}" placeholder="Ingrese la habitacion" required>
+                                                                        </div>
+                                                                        
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label class="form-label required">Estado</label>
+                                                                            <select class="form-select" name="estado" required>
+                                                                                <option value="" hidden selected>Seleccione el tipo</option>
+                                                                                {% for idx, estado in estados %}
+                                                                                    <option value="{{ idx }}" {% if hab.estado == idx %}selected{% endif %}>
+                                                                                        {{ estado }}
+                                                                                    </option>
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                        </div>                                                
+                                                                        
+                                                                        <div class="{% if hab.estado != 3 %}col-md-12{% else %}col-md-6{% endif %} mb-3">
+                                                                            <label class="form-label required">Tipo</label>
+                                                                            <select class="form-select" name="tipo" required>
+                                                                                <option value="" hidden selected>Seleccione el tipo</option>
+                                                                                {% for tipo in tipos %}
+                                                                                    <option value="{{ tipo }}" {% if hab.tipo == tipo %}selected{% endif %}>{{ tipo }}</option>
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <div class="w-100">
+                                                                        <div class="row">
+                                                                            <div class="col">
+                                                                                <a href="#" class="btn w-100" data-bs-dismiss="modal">
+                                                                                    Cancelar
+                                                                                </a>
+                                                                            </div>
+                                                                            <div class="col">
+                                                                                <button type="submit" class="btn btn-info w-100">
+                                                                                    Editar
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="modal modal-blur fade" id="delete{{hab.id}}" tabindex="-1" role="dialog" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                                        <div class="modal-content">
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        <div class="modal-status bg-danger"></div>
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">Eliminar Habitacion</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <form action="{% url 'habitacion_delete' hab.id %}" method="post">
+                                                                {% csrf_token %}
+                                                                <div class="modal-body text-center py-4">
+                                                                    <p>¿En serio desea eliminar esta habitacion?</p>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <div class="w-100">
+                                                                        <div class="row">
+                                                                            <div class="col">
+                                                                                <a href="#" class="btn w-100" data-bs-dismiss="modal">
+                                                                                    Cancelar
+                                                                                </a>
+                                                                            </div>
+                                                                            <div class="col">
+                                                                                <button type="submit" class="btn btn-danger w-100">
+                                                                                    Eliminar
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Agregar Habitacion</h4>
+                        </div>
+                        <form id="form_agregar_habitacion" action="{% url 'habitaciones'  %}" method="POST">
+                            {% csrf_token %}
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label required">Habitacion</label>
+                                    <input type="text" class="form-control" name="habitacion" value="{{ last_hab|add:1 }}" placeholder="Ingrese la habitacion" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label required">Tipo</label>
+                                    <select class="form-select " name="tipo" required>
+                                        <option value="" hidden selected>Seleccione el tipo</option>
+                                        {% for tipo in tipos %}
+                                            <option value="{{ tipo }}">{{ tipo }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <div class="row align-items-center">
+                                    <div class="col-auto">
+                                        <button type="submit" class="btn btn-primary">
+                                            Guardar
+                                        </button>
+                                    </div>
+                                    <div class="col d-none">Learn more about <a href="#">Project ID</a></div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

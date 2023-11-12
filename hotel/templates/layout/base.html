@@ -1,0 +1,177 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>{% block title %} Hotel Rosse {% endblock %}</title>
+    <link href="{% static 'dist/css/tabler.min.css' %}" rel="stylesheet" />
+    <link href="{% static 'dist/css/tabler-flags.min.css' %}" rel="stylesheet" />
+    <link href="{% static 'dist/css/tabler-payments.min.css' %}" rel="stylesheet" />
+    <link href="{% static 'dist/css/tabler-vendors.min.css' %}" rel="stylesheet" />
+    <link href="{% static 'dist/css/demo.min.css' %}" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.css" rel="stylesheet" />
+    <style>
+        @import url("https://rsms.me/inter/inter.css");
+
+        :root {
+            --tblr-font-sans-serif: "Inter Var", -apple-system, BlinkMacSystemFont,
+                San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif;
+        }
+
+        body {
+            font-feature-settings: "cv03", "cv04", "cv11";
+        }
+    </style>
+</head>
+
+<body>
+    <script src="{% static 'dist/js/demo-theme.min.js' %}"></script>
+    <div class="page">
+        {% include "./header.html" %}
+
+        <div class="page-wrapper">
+            <div class="page-header d-print-none">
+                <div class="container-xl">
+                    <div class="row g-2 align-items-center">
+                        <div class="col">
+                            <h2 class="page-title">{% block title_page %}{% endblock %}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% block content %}{% endblock %} {% include "./footer.html" %}
+        </div>
+    </div>
+
+    <script src="{% static 'dist/libs/list.js/dist/list.min.js' %}" defer></script>
+    <script src="{% static 'dist/js/tabler.min.js' %}" defer></script>
+    <script src="{% static 'dist/js/demo.min.js' %}" defer></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+    <script src="{% static 'consulta.js' %}"></script>
+    <script>
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": false,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "3000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        }
+    </script>
+    <script src="{% static 'dist/js/validations.js' %}"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const list = new List("table-default", {
+                sortClass: "table-sort",
+                listClass: "table-tbody",
+                valueNames: [
+                    "sort-name",
+                    "sort-type",
+                    "sort-city",
+                    "sort-score",
+                    { attr: "data-date", name: "sort-date" },
+                    { attr: "data-progress", name: "sort-progress" },
+                    "sort-quantity",
+                ],
+            });
+        });
+
+        $("#tabladata").DataTable({
+            responsive: true,
+            language: {
+                decimal: ".",
+                emptyTable: "No hay datos para mostrar",
+                info: "Mostrando _START_ a _END_ de _TOTAL_ datos",
+                infoEmpty: "Mostrando 0 to 0 of 0 Datos",
+                infoFiltered: "(Filtrado de _MAX_ total de datos)",
+                lengthEmpresa: "Mostrar _MENU_ datos",
+                loadingRecords: "Cargando...",
+                processing: "Procesando...",
+                search: "Buscar:",
+                zeroRecords: "Sin resultados encontrados",
+                paginate: {
+                    first: "Primero",
+                    last: "Ultimo",
+                    next: "Siguiente",
+                    previous: "Anterior",
+                },
+            },
+        });
+    </script>
+
+    {% for hab in habitaciones %}
+    <script>
+        $("#table-huesped{{hab.id}}").DataTable({
+            responsive: true,
+            searching: false,
+            paging: false,
+            language: {
+                decimal: ".",
+                emptyTable: "Esta habitación aún no tiene huéspedes",
+                info: "Mostrando _START_ a _END_ de _TOTAL_ datos",
+                infoEmpty: "Mostrando 0 to 0 of 0 Datos",
+                infoFiltered: "(Filtrado de _MAX_ total de datos)",
+                lengthEmpresa: "Mostrar _MENU_ datos",
+                loadingRecords: "Cargando...",
+                processing: "Procesando...",
+                search: "Buscar:",
+                zeroRecords: "Sin resultados encontrados",
+                paginate: {
+                    first: "Primero",
+                    last: "Ultimo",
+                    next: "Siguiente",
+                    previous: "Anterior",
+                },
+            },
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var table = $('#table-huesped{{hab.id}}').DataTable();
+            $('#config{{hab.id}}').on('shown.bs.modal', function () {
+                table.columns.adjust().draw();
+            });
+            new TomSelect("#select{{hab.id}}", {});
+        });
+    </script>
+    {% endfor %}
+
+    {% if messages %}
+        {% for message in messages %}
+            <script>var toastrType = '';</script>
+            {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+            <script>toastrType = "error";</script>
+            {% elif message.level == DEFAULT_MESSAGE_LEVELS.WARNING %}
+            <script>document.addEventListener("DOMContentLoaded", function () {$('#{{ message }}').modal('show')});</script>
+            {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+            <script>toastrType = "success";</script>
+            {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+            <script>toastrType = "info";</script>
+            {% endif %}
+            <script>toastr[toastrType]("{{ message }}");</script>
+        {% endfor %}
+    {% endif %}
+
+</body>
+
+</html>

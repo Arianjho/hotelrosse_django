@@ -1,0 +1,266 @@
+{% extends "layout/base.html" %}
+
+{% block title %}
+    Hotel Rosse
+{% endblock %}
+
+{% block title_page %}
+    <a style="padding: 2px 5px; margin-right: 5px;" href="#" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#agregar">
+        <svg style="margin: 0;" xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-mood-plus" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+            <path d="M20.985 12.528a9 9 0 1 0 -8.45 8.456"></path>
+            <path d="M16 19h6"></path>
+            <path d="M19 16v6"></path>
+            <path d="M9 10h.01"></path>
+            <path d="M15 10h.01"></path>
+            <path d="M9.5 15c.658 .64 1.56 1 2.5 1s1.842 -.36 2.5 -1"></path>
+         </svg>
+    </a>
+    Listado de Huespedes
+{% endblock %}
+
+{% block content %}
+    <div class="modal modal-blur fade" id="agregar" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+            <div class="modal-content">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-status bg-info"></div>
+                <div class="modal-header">
+                    <h5 class="modal-title">Agregar Huesped</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="form_agregar_huesped" action="{% url 'huespedes'  %}" method="post">
+                    {% csrf_token %}
+
+                    <div class="modal-body py-4">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label required">DNI</label>
+                                <div class="input-group">
+                                    <input id="dni" class="form-control" type="text" placeholder="Ingrese el DNI" name="dni">
+                                    <button class="btn" type="button" id="consultar_dni">
+                                        <svg style="margin: 0;" xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                            <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"></path>
+                                            <path d="M21 21l-6 -6"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label required">Huesped</label>
+                                <input id="huesped" class="form-control" type="text" placeholder="Ingrese el huesped" name="huesped">                                
+                            </div>
+                            <div class="col-md-5 mb-3">
+                                <label class="form-label">Direccion</label>
+                                <input class="form-control" type="text" placeholder="Ingrese la direccion" name="direccion">                               
+                            </div>
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label">Estado Civil</label>
+                                <input class="form-control" type="text" placeholder="Ingrese el estado civil" name="estado_civil">                            
+                            </div>
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label">Telefono</label>
+                                <input class="form-control" type="tel" placeholder="Ingrese el telefono" name="telefono">                              
+                            </div>
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label">Ciudad</label>
+                                <input class="form-control" type="text" placeholder="Ingrese la ciudad" name="ciudad">                              
+                            </div>
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label">Pais</label>
+                                <input class="form-control" type="text" placeholder="Ingrese el pais" name="pais">                               
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Profesion</label>
+                                <input class="form-control" type="text" placeholder="Ingrese la profesion" name="profesion">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="w-100">
+                            <div class="row justify-content-end">
+                                <div class="col-3">
+                                    <a href="#" class="btn w-100" data-bs-dismiss="modal">
+                                        Cancelar
+                                    </a>
+                                </div>
+                                <div class="col-3">
+                                    <button type="submit" class="btn btn-success w-100">
+                                        Guardar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="page-body">
+        <div class="container-xl"> 
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="table-default" class="table-responsive">
+                                <table id="tabladata" class="table display hover cell-border">
+                                    <thead>
+                                        <tr>
+                                            <th width="8%">DNI</th>
+                                            <th width="17%">Huesped</th>
+                                            <th width="12%">Procedencia</th>
+                                            <th width="8%">Estado C.</th>
+                                            <th width="17%">Direccion</th>
+                                            <th width="8%">Telefono</th>
+                                            <th width="20%">Profesion</th>
+                                            <th width="10%">Operaciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="table-tbody">
+                                        {% for hue in huespedes %}
+                                            <tr>
+                                                <td>{{hue.dni}}</td>
+                                                <td>{{hue.huesped}}</td>
+                                                <td>{{ hue.ciudad|add:" - " |add:hue.pais|default:"-" }}</td>
+                                                <td>{{ hue.estado_civil|default:"-" }}</td>
+                                                <td>{{ hue.direccion|default:"-" }}</td>
+                                                <td>{{ hue.telefono|default:"-" }}</td>
+                                                <td>{{ hue.profesion|default:"-" }}</td>
+                                                <td class="text-center">
+                                                    <a style="padding: 2px 5px;" href="#" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#edit{{hue.id}}">
+                                                        <svg style="margin: 0;" xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-edit" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                            <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"></path>
+                                                            <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"></path>
+                                                            <path d="M16 5l3 3"></path>
+                                                        </svg>
+                                                    </a>
+                                                    <a style="padding: 2px 5px;" href="#" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#delete{{hue.id}}">                                                
+                                                        <svg style="margin: 0;" xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                            <path d="M4 7l16 0"></path>
+                                                            <path d="M10 11l0 6"></path>
+                                                            <path d="M14 11l0 6"></path>
+                                                            <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
+                                                            <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
+                                                         </svg>
+                                                    </a>
+                                                </td>
+
+                                                <div class="modal modal-blur fade" id="edit{{hue.id}}" tabindex="-1" role="dialog" aria-hidden="true">
+                                                    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+                                                        <div class="modal-content">
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        <div class="modal-status bg-info"></div>
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">Editar datos de {{hue.huesped}}</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <form action="{% url 'huesped_update' hue.id %}" method="post">
+                                                                {% csrf_token %}
+
+                                                                <div class="modal-body py-4">
+                                                                    <div class="row">
+                                                                        <div class="col-md-2 mb-3">
+                                                                            <label class="form-label required">DNI</label>
+                                                                            <input class="form-control" type="text" placeholder="Ingrese el DNI" name="dni" value="{{hue.dni}}">
+                                                                        </div>
+                                                                        <div class="col-md-4 mb-3">
+                                                                            <label class="form-label required">Huesped</label>
+                                                                            <input class="form-control" type="text" placeholder="Ingrese el huesped" name="huesped" value="{{hue.huesped}}">                                
+                                                                        </div>
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label class="form-label">Direccion</label>
+                                                                            <input class="form-control" type="text" placeholder="Ingrese la direccion" name="direccion" value="{{hue.direccion}}">                               
+                                                                        </div>
+                                                                        <div class="col-md-2 mb-3">
+                                                                            <label class="form-label">Estado Civil</label>
+                                                                            <input class="form-control" type="text" placeholder="Ingrese el estado civil" name="estado_civil" value="{{hue.estado_civil}}">                            
+                                                                        </div>
+                                                                        <div class="col-md-2 mb-3">
+                                                                            <label class="form-label">Telefono</label>
+                                                                            <input class="form-control" type="tel" placeholder="Ingrese el telefono" name="telefono" value="{{hue.telefono}}">                              
+                                                                        </div>
+                                                                        <div class="col-md-2 mb-3">
+                                                                            <label class="form-label">Ciudad</label>
+                                                                            <input class="form-control" type="text" placeholder="Ingrese la ciudad" name="ciudad" value="{{hue.ciudad}}">                              
+                                                                        </div>
+                                                                        <div class="col-md-2 mb-3">
+                                                                            <label class="form-label">Pais</label>
+                                                                            <input class="form-control" type="text" placeholder="Ingrese el pais" name="pais" value="{{hue.pais}}">                               
+                                                                        </div>
+                                                                        <div class="col-md-4 mb-3">
+                                                                            <label class="form-label">Profesion</label>
+                                                                            <input class="form-control" type="text" placeholder="Ingrese la profesion" name="profesion" value="{{hue.profesion}}">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <div class="w-100">
+                                                                        <div class="row justify-content-end">
+                                                                            <div class="col-3">
+                                                                                <a href="#" class="btn w-100" data-bs-dismiss="modal">
+                                                                                    Cancelar
+                                                                                </a>
+                                                                            </div>
+                                                                            <div class="col-3">
+                                                                                <button type="submit" class="btn btn-info w-100">
+                                                                                    Editar
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="modal modal-blur fade" id="delete{{hue.id}}" tabindex="-1" role="dialog" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                                        <div class="modal-content">
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        <div class="modal-status bg-danger"></div>
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">Eliminar Huesped</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <form action="{% url 'huesped_delete' hue.id %}" method="post">
+                                                                {% csrf_token %}
+                                                                <div class="modal-body text-center py-4">
+                                                                    <p>¿En serio desea eliminar a {{hue.huesped}}?</p>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <div class="w-100">
+                                                                        <div class="row">
+                                                                            <div class="col">
+                                                                                <a href="#" class="btn w-100" data-bs-dismiss="modal">
+                                                                                    Cancelar
+                                                                                </a>
+                                                                            </div>
+                                                                            <div class="col">
+                                                                                <button type="submit" class="btn btn-danger w-100">
+                                                                                    Eliminar
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
